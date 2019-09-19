@@ -1,0 +1,150 @@
+package com.example.sensormanager;
+
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.BitmapFactory.Options;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.Surface;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.Toast;
+
+
+
+public class acceleromparticles extends Activity {
+
+    public SimulationView mSimulationView;
+    private SensorManager mSensorManager;
+    private PowerManager mPowerManager;
+    private WindowManager mWindowManager;
+    private Display mDisplay;
+    private WakeLock mWakeLock;
+    public int  ui = 1 ;
+    public FrameLayout jfl;
+    public Button bbb ;
+
+    /** Called when the activity is first created. */
+    @SuppressLint("ResourceType")
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Get an instance of the SensorManager
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        // Get an instance of the PowerManager
+        mPowerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
+        // Get an instance of the WindowManager
+        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        mDisplay = mWindowManager.getDefaultDisplay();
+        mSimulationView = new SimulationView(getApplicationContext());
+        //    fl.addView( mSimulationView );
+        setContentView( R.layout.dyn);
+
+         jfl = findViewById( R.id.fl );
+        jfl.addView( mSimulationView );
+        jfl.addView( bbb );
+        bbb.setElevation( 120 );
+
+        mSimulationView.setBackgroundResource(R.drawable.wood);
+
+       // setContentView(mSimulationView);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*
+         * when the activity is resumed, we acquire a wake-lock so that the
+         * screen stays on, since the user will likely not be fiddling with the
+         * screen or buttons.
+         */
+        //mWakeLock.acquire();
+
+        // Start the simulation
+        mSimulationView.startSimulation();
+        // mSimulationView.setLayoutParams(new FrameLayout.LayoutParams(700, 300));
+
+    }
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        /*
+         * When the activity is paused, we make sure to stop the simulation,
+         * release our sensor resources and wake locks
+         */
+
+        // Stop the simulation
+        mSimulationView.stopSimulation();
+        // and release our wake-lock
+        // mWakeLock.release();
+    }
+
+    class SimulationView extends FrameLayout implements SensorEventListener {
+        // diameter of the balls in meters
+        private static final float sBallDiameter = 0.000395f;  // nyy size of the ball diameter
+        private static final float sBallDiameter2 = sBallDiameter * sBallDiameter;
+        private final int mDstWidth;
+        private final int mDstHeight;
+        private Sensor mAccelerometer;
+        private long mLastT;
+        private float mXDpi;
+        private float mYDpi;
+        private float mMetersToPixelsX;
+        private float mMetersToPixelsY;
+        private float mXOrigin;
+        private float mYOrigin;
+        private float mSensorX;
+        private float mSensorY;
+        private float mHorizontalBound;
+        private float mVerticalBound;
+        public final ParticleSystem mParticleSystem;
+        /*
+         * Each of our particle holds its previous and current position, its
+         * acceleration. for added realism each particle has its own friction
+         * coefficient.
+         */
+
+        class customview extends View{
+
+            public customview(Context context) {
+                super( context );
+
+            }
+        }
+
+        class Particle extends View {
+            private float mPosX = 0 ;//  nyy (float) Math.random();
+            private float mPosY = 0 ;// nyy (float) Math.random();
+            private float mVelX;
+            private float mVelY;
+
+            public Particle(Context context) {
+                super( context );
+            }
+
+            public Particle(Context context, AttributeSet attrs) {
+                super(context, attrs);
+            }
+
+            public Particle(Context c
